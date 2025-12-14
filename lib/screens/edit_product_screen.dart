@@ -19,6 +19,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
   late TextEditingController _descriptionController;
   late TextEditingController _imageUrlController;
   late TextEditingController _categoryController;
+  late TextEditingController _weightController;
+  late TextEditingController _expirationDateController;
+  late TextEditingController _stockController;
 
   bool _isLoading = false;
 
@@ -30,6 +33,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _descriptionController = TextEditingController(text: widget.product?.description ?? '');
     _imageUrlController = TextEditingController(text: widget.product?.imageUrl ?? '');
     _categoryController = TextEditingController(text: widget.product?.category ?? 'Frozen');
+    _weightController = TextEditingController(text: widget.product?.weight.toString() ?? '');
+    _expirationDateController = TextEditingController(text: widget.product?.expirationDate ?? '2025-12-31');
+    _stockController = TextEditingController(text: widget.product?.stock.toString() ?? '');
   }
 
   @override
@@ -39,6 +45,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _descriptionController.dispose();
     _imageUrlController.dispose();
     _categoryController.dispose();
+    _weightController.dispose();
+    _expirationDateController.dispose();
+    _stockController.dispose();
     super.dispose();
   }
 
@@ -52,13 +61,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
         name: _nameController.text,
         category: _categoryController.text,
         price: double.tryParse(_priceController.text) ?? 0,
-        weight: widget.product?.weight ?? 1.0,
-        expirationDate: widget.product?.expirationDate ?? '2025-12-31',
+        weight: double.tryParse(_weightController.text) ?? 1.0,
+        expirationDate: _expirationDateController.text,
         description: _descriptionController.text,
         rating: widget.product?.rating ?? 0.0,
         reviewCount: widget.product?.reviewCount ?? 0,
         imageUrl: _imageUrlController.text.isNotEmpty ? _imageUrlController.text : 'https://via.placeholder.com/150',
-        stock: widget.product?.stock ?? 100,
+        stock: int.tryParse(_stockController.text) ?? 100,
       );
 
       try {
@@ -107,6 +116,27 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 TextFormField(
                   controller: _categoryController,
                   decoration: const InputDecoration(labelText: 'Kategori'),
+                  validator: (v) => v!.isEmpty ? 'Wajib diisi' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _weightController,
+                  decoration: const InputDecoration(labelText: 'Berat (g/kg)'),
+                  keyboardType: TextInputType.number,
+                  validator: (v) => v!.isEmpty ? 'Wajib diisi' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _expirationDateController,
+                  decoration: const InputDecoration(labelText: 'Tanggal Kadaluarsa (YYYY-MM-DD)'),
+                  validator: (v) => v!.isEmpty ? 'Wajib diisi' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _stockController,
+                  decoration: const InputDecoration(labelText: 'Stok'),
+                  keyboardType: TextInputType.number,
+                  validator: (v) => v!.isEmpty ? 'Wajib diisi' : null,
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
