@@ -33,8 +33,8 @@ class _MainScreenState extends State<MainScreen> {
       bottomNavigationBar: Container(
         height: 88,
         decoration: BoxDecoration(
-          color: bgColor.withValues(alpha: 0.9),
-          border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+          color: bgColor.withOpacity(0.9),
+          border: Border(top: BorderSide(color: Colors.white.withOpacity(0.05))),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,

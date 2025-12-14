@@ -41,7 +41,7 @@ class CartScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.white.withValues(alpha: 0.2)),
+                  Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.white.withOpacity(0.2)),
                   const SizedBox(height: 16),
                   const Text('Keranjang Kosong', style: TextStyle(fontSize: 18, color: Colors.grey)),
                   const SizedBox(height: 8),
@@ -86,7 +86,7 @@ class CartScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: const Color(0xFF162A2A),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                      border: Border.all(color: Colors.white.withOpacity(0.05)),
                     ),
                     child: Row(
                       children: [
@@ -203,7 +203,7 @@ class CartScreen extends StatelessWidget {
                         foregroundColor: Colors.black,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         elevation: 5,
-                        shadowColor: primary.withValues(alpha: 0.3),
+                        shadowColor: primary.withOpacity(0.3),
                       ),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.center,

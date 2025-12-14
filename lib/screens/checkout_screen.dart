@@ -149,7 +149,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   decoration: BoxDecoration(
                     color: const Color(0xFF162A2A),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                    border: Border.all(color: Colors.white.withOpacity(0.05)),
                   ),
                   child: Column(
                     children: [
@@ -158,7 +158,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         children: [
                           Container(
                             padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(color: primary.withValues(alpha: 0.1), shape: BoxShape.circle),
+                            decoration: BoxDecoration(color: primary.withOpacity(0.1), shape: BoxShape.circle),
                             child: Icon(Icons.location_on, color: primary),
                           ),
                           const SizedBox(width: 16),
@@ -172,7 +172,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                     const SizedBox(width: 8),
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                      decoration: BoxDecoration(color: primary.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(4)),
+                                      decoration: BoxDecoration(color: primary.withOpacity(0.2), borderRadius: BorderRadius.circular(4)),
                                       child: Text('UTAMA', style: TextStyle(color: primary, fontSize: 10, fontWeight: FontWeight.bold)),
                                     )
                                   ],
@@ -242,7 +242,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF162A2A).withValues(alpha: 0.5),
+                    color: const Color(0xFF162A2A).withOpacity(0.5),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: Colors.white12, style: BorderStyle.solid),
                   ),
@@ -350,7 +350,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         width: 160,
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? primary.withValues(alpha: 0.05) : const Color(0xFF162A2A),
+          color: isSelected ? primary.withOpacity(0.05) : const Color(0xFF162A2A),
           border: Border.all(color: isSelected ? primary : Colors.transparent, width: 2),
           borderRadius: BorderRadius.circular(16),
         ),
@@ -395,7 +395,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
          decoration: BoxDecoration(
-          color: isSelected ? primary.withValues(alpha: 0.05) : const Color(0xFF162A2A),
+          color: isSelected ? primary.withOpacity(0.05) : const Color(0xFF162A2A),
           border: Border.all(color: isSelected ? primary : Colors.transparent),
           borderRadius: BorderRadius.circular(16),
         ),

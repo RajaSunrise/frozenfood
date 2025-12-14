@@ -72,7 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               if (user != null) _editProfile(user);
             },
             icon: CircleAvatar(
-              backgroundColor: Colors.white.withValues(alpha: 0.1),
+              backgroundColor: Colors.white.withOpacity(0.1),
               child: Icon(Icons.edit, color: primary),
             ),
           )
@@ -91,8 +91,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   height: 120,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: primary.withValues(alpha: 0.2), width: 4),
-                    boxShadow: [BoxShadow(color: primary.withValues(alpha: 0.2), blurRadius: 20)],
+                    border: Border.all(color: primary.withOpacity(0.2), width: 4),
+                    boxShadow: [BoxShadow(color: primary.withOpacity(0.2), blurRadius: 20)],
                     image: DecorationImage(
                       image: NetworkImage(user?.avatarUrl ?? 'https://via.placeholder.com/150'),
                       fit: BoxFit.cover,
@@ -219,8 +219,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 label: const Text('Keluar'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.red,
-                  side: BorderSide(color: Colors.red.withValues(alpha: 0.3)),
-                  backgroundColor: Colors.red.withValues(alpha: 0.05),
+                  side: BorderSide(color: Colors.red.withOpacity(0.3)),
+                  backgroundColor: Colors.red.withOpacity(0.05),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
@@ -275,7 +275,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: primary.withValues(alpha: 0.1),
+                color: primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(icon, color: primary, size: 20),
@@ -286,7 +286,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.2),
+                  color: Colors.red.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(badge, style: const TextStyle(color: Colors.red, fontSize: 10, fontWeight: FontWeight.bold)),

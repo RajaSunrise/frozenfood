@@ -49,7 +49,7 @@ class ProductDetailScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             CircleAvatar(
-                              backgroundColor: Colors.black.withValues(alpha: 0.3),
+                              backgroundColor: Colors.black.withOpacity(0.3),
                               child: IconButton(
                                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                                 onPressed: () => Navigator.pop(context),
@@ -59,7 +59,7 @@ class ProductDetailScreen extends StatelessWidget {
                               children: [
                                 // Edit Button
                                 CircleAvatar(
-                                  backgroundColor: Colors.black.withValues(alpha: 0.3),
+                                  backgroundColor: Colors.black.withOpacity(0.3),
                                   child: IconButton(
                                     icon: const Icon(Icons.edit, color: Colors.white),
                                     onPressed: () {
@@ -70,7 +70,7 @@ class ProductDetailScreen extends StatelessWidget {
                                 const SizedBox(width: 10),
                                 // Delete Button
                                 CircleAvatar(
-                                  backgroundColor: Colors.black.withValues(alpha: 0.3),
+                                  backgroundColor: Colors.black.withOpacity(0.3),
                                   child: IconButton(
                                     icon: const Icon(Icons.delete, color: Colors.red),
                                     onPressed: () {
@@ -87,7 +87,7 @@ class ProductDetailScreen extends StatelessWidget {
                                           Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()));
                                         },
                                         child: CircleAvatar(
-                                          backgroundColor: Colors.black.withValues(alpha: 0.3),
+                                          backgroundColor: Colors.black.withOpacity(0.3),
                                           child: const Icon(Icons.shopping_cart_outlined, color: Colors.white),
                                         ),
                                       ),
@@ -144,7 +144,7 @@ class ProductDetailScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: const Color(0xFF162A2A),
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                              border: Border.all(color: Colors.white.withOpacity(0.1)),
                             ),
                             child: Row(
                               children: [
@@ -159,7 +159,7 @@ class ProductDetailScreen extends StatelessWidget {
                       const SizedBox(height: 10),
                       Text(
                         'Rp ${product.price.toStringAsFixed(0)}',
-                        style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: primary, shadows: [Shadow(color: primary.withValues(alpha: 0.3), blurRadius: 10)]),
+                        style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: primary, shadows: [Shadow(color: primary.withOpacity(0.3), blurRadius: 10)]),
                       ),
                       const SizedBox(height: 20),
                       // Specs Grid
@@ -231,7 +231,7 @@ class ProductDetailScreen extends StatelessWidget {
                             foregroundColor: Colors.black,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                             elevation: 5,
-                            shadowColor: primary.withValues(alpha: 0.4),
+                            shadowColor: primary.withOpacity(0.4),
                           ),
                           icon: const Icon(Icons.shopping_bag_outlined),
                           label: const Text('Tambah Keranjang', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
@@ -255,11 +255,11 @@ class ProductDetailScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF162A2A),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+          border: Border.all(color: Colors.white.withOpacity(0.05)),
         ),
         child: Column(
           children: [
-            Icon(icon, color: const Color(0xFF13ECEC).withValues(alpha: 0.8)), // Primary
+            Icon(icon, color: const Color(0xFF13ECEC).withOpacity(0.8)), // Primary
             const SizedBox(height: 8),
             Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey)),
             Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
