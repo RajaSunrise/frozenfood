@@ -1,3 +1,5 @@
+import 'about_app_screen.dart';
+import 'help_center_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -18,6 +20,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final nameController = TextEditingController(text: user.name);
     final phoneController = TextEditingController(text: user.phoneNumber);
     final addressController = TextEditingController(text: user.address);
+    final avatarController = TextEditingController(text: user.avatarUrl); // Simplified avatar editing
 
     showDialog(context: context, builder: (ctx) => AlertDialog(
       title: const Text('Edit Profil'),
@@ -30,6 +33,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             TextField(controller: phoneController, decoration: const InputDecoration(labelText: 'Nomor HP')),
             const SizedBox(height: 12),
             TextField(controller: addressController, decoration: const InputDecoration(labelText: 'Alamat')),
+            const SizedBox(height: 12),
+            TextField(controller: avatarController, decoration: const InputDecoration(labelText: 'URL Avatar')),
           ],
         ),
       ),
@@ -41,6 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               name: nameController.text,
               phoneNumber: phoneController.text,
               address: addressController.text,
+              avatarUrl: avatarController.text,
             );
             await auth.updateUser(updatedUser);
             Navigator.pop(ctx);
@@ -87,9 +93,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shape: BoxShape.circle,
                     border: Border.all(color: primary.withValues(alpha: 0.2), width: 4),
                     boxShadow: [BoxShadow(color: primary.withValues(alpha: 0.2), blurRadius: 20)],
-                    image: const DecorationImage(
-                      image: NetworkImage('https://via.placeholder.com/150'),
+                    image: DecorationImage(
+                      image: NetworkImage(user?.avatarUrl ?? 'https://via.placeholder.com/150'),
                       fit: BoxFit.cover,
+                      onError: (_,__) => const AssetImage('assets/default_avatar.png'), // fallback to nothing or error widget handled by Image provider logic usually
                     ),
                   ),
                 ),
@@ -187,9 +194,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   _buildMenuItem(context, Icons.notifications, 'Notifikasi', isToggle: true),
                   const Divider(height: 1, color: Colors.white12),
-                  _buildMenuItem(context, Icons.help, 'Pusat Bantuan'),
+                  _buildMenuItem(context, Icons.help, 'Pusat Bantuan', onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpCenterScreen()));
+                  }),
                    const Divider(height: 1, color: Colors.white12),
-                  _buildMenuItem(context, Icons.info, 'Tentang Aplikasi'),
+                  _buildMenuItem(context, Icons.info, 'Tentang Aplikasi', onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutAppScreen()));
+                  }),
                 ],
               ),
             ),

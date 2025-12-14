@@ -11,7 +11,7 @@ class MobileDatabaseService implements DatabaseService {
   @override
   Future<void> init() async {
     if (_database != null) return;
-    String path = join(await getDatabasesPath(), 'frozen_food_v3.db'); // Bumped DB name/version for schema change
+    String path = join(await getDatabasesPath(), 'frozen_food_v5.db'); // Bumped DB version
     _database = await openDatabase(
       path,
       version: 1,
@@ -22,7 +22,7 @@ class MobileDatabaseService implements DatabaseService {
   }
 
   void _createDb(Database db) {
-    db.execute('CREATE TABLE users(id TEXT PRIMARY KEY, email TEXT, name TEXT, password TEXT, address TEXT, phoneNumber TEXT)');
+    db.execute('CREATE TABLE users(id TEXT PRIMARY KEY, email TEXT, name TEXT, password TEXT, address TEXT, phoneNumber TEXT, avatarUrl TEXT, points INTEGER)');
     db.execute('CREATE TABLE orders(id TEXT PRIMARY KEY, userId TEXT, totalAmount REAL, date TEXT, status TEXT, shippingMethod TEXT, paymentMethod TEXT, shippingAddress TEXT, items TEXT)');
   }
 
