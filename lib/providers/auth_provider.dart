@@ -64,6 +64,13 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<void> addPoints(int amount) async {
+    if (_currentUser != null) {
+      User updatedUser = _currentUser!.copyWith(points: _currentUser!.points + amount);
+      await updateUser(updatedUser);
+    }
+  }
+
   Future<List<OrderModel>> getOrders() async {
     if (_currentUser != null) {
       return await _dbService.getOrders(_currentUser!.id);

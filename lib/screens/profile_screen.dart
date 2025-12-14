@@ -1,3 +1,5 @@
+import 'about_app_screen.dart';
+import 'help_center_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -192,9 +194,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   _buildMenuItem(context, Icons.notifications, 'Notifikasi', isToggle: true),
                   const Divider(height: 1, color: Colors.white12),
-                  _buildMenuItem(context, Icons.help, 'Pusat Bantuan'),
+                  _buildMenuItem(context, Icons.help, 'Pusat Bantuan', onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpCenterScreen()));
+                  }),
                    const Divider(height: 1, color: Colors.white12),
-                  _buildMenuItem(context, Icons.info, 'Tentang Aplikasi'),
+                  _buildMenuItem(context, Icons.info, 'Tentang Aplikasi', onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutAppScreen()));
+                  }),
                 ],
               ),
             ),

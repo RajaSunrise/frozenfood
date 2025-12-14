@@ -6,6 +6,7 @@ class User {
   final String address;
   final String phoneNumber;
   final String avatarUrl;
+  final int points;
 
   User({
     required this.id,
@@ -14,7 +15,8 @@ class User {
     required this.password,
     this.address = '',
     this.phoneNumber = '',
-    this.avatarUrl = 'https://i.pravatar.cc/150', // Default avatar
+    this.avatarUrl = 'https://i.pravatar.cc/150',
+    this.points = 0,
   });
 
   Map<String, dynamic> toJson() {
@@ -26,6 +28,7 @@ class User {
       'address': address,
       'phoneNumber': phoneNumber,
       'avatarUrl': avatarUrl,
+      'points': points,
     };
   }
 
@@ -38,6 +41,7 @@ class User {
       address: json['address'] ?? '',
       phoneNumber: json['phoneNumber'] ?? '',
       avatarUrl: json['avatarUrl'] ?? 'https://i.pravatar.cc/150',
+      points: json['points'] ?? 0,
     );
   }
 
@@ -48,6 +52,7 @@ class User {
     String? address,
     String? phoneNumber,
     String? avatarUrl,
+    int? points,
   }) {
     return User(
       id: id,
@@ -57,6 +62,7 @@ class User {
       address: address ?? this.address,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       avatarUrl: avatarUrl ?? this.avatarUrl,
+      points: points ?? this.points,
     );
   }
 }

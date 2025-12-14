@@ -4,6 +4,7 @@ import '../providers/cart_provider.dart';
 import '../providers/auth_provider.dart';
 import '../models/order_model.dart';
 import '../models/user.dart';
+import '../services/notification_service.dart';
 import 'main_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -23,6 +24,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     super.initState();
     final user = Provider.of<AuthProvider>(context, listen: false).currentUser;
     _addressController.text = user?.address ?? '';
+    NotificationService().init(); // Ensure init
   }
 
   @override
@@ -94,7 +96,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       );
 
       await auth.saveOrder(order);
+      await auth.addPoints(50); // Add 50 points
 
+      // Send Notification
+      await NotificationService().showNotification(
+        'Pesanan Berhasil!',
+        'Pesanan Anda telah diterima. Anda mendapatkan 50 Poin!'
+      );
+
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pesanan Dibuat!')));
       cart.clear();
       Navigator.popUntil(context, (route) => route.isFirst);

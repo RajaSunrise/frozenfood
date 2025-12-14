@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import '../models/product.dart';
 import '../providers/cart_provider.dart';
 import '../providers/product_provider.dart';
+import '../services/notification_service.dart';
 import 'edit_product_screen.dart';
+import 'cart_screen.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final Product product;
@@ -80,9 +82,14 @@ class ProductDetailScreen extends StatelessWidget {
                                 Consumer<CartProvider>(
                                   builder: (_, cart, __) => Stack(
                                     children: [
-                                      CircleAvatar(
-                                        backgroundColor: Colors.black.withValues(alpha: 0.3),
-                                        child: const Icon(Icons.shopping_cart_outlined, color: Colors.white),
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()));
+                                        },
+                                        child: CircleAvatar(
+                                          backgroundColor: Colors.black.withValues(alpha: 0.3),
+                                          child: const Icon(Icons.shopping_cart_outlined, color: Colors.white),
+                                        ),
                                       ),
                                       if (cart.itemCount > 0)
                                         Positioned(
@@ -214,8 +221,9 @@ class ProductDetailScreen extends StatelessWidget {
                       child: SizedBox(
                         height: 54,
                         child: ElevatedButton.icon(
-                          onPressed: () {
+                          onPressed: () async {
                             Provider.of<CartProvider>(context, listen: false).addItem(product, 1);
+                             await NotificationService().showNotification('Keranjang', 'Produk ditambahkan ke keranjang');
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ditambahkan ke keranjang')));
                           },
                           style: ElevatedButton.styleFrom(
