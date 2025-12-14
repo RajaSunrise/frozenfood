@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'home_screen.dart';
 import 'cart_screen.dart';
 import 'profile_screen.dart';
+import 'product_list_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,7 +16,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(), // Beranda
-    const Center(child: Text("Produk Page")), // Placeholder for Produk (Usually same as Home but filtered)
+    const ProductListScreen(), // Produk Page
     const CartScreen(),
     const ProfileScreen(),
   ];

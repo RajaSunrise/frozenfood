@@ -1,15 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
+import '../models/user.dart';
 import 'login_screen.dart';
+import 'order_history_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+
+  void _editProfile(User user) {
+    final nameController = TextEditingController(text: user.name);
+    final phoneController = TextEditingController(text: user.phoneNumber);
+    final addressController = TextEditingController(text: user.address);
+
+    showDialog(context: context, builder: (ctx) => AlertDialog(
+      title: const Text('Edit Profil'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Nama Lengkap')),
+            const SizedBox(height: 12),
+            TextField(controller: phoneController, decoration: const InputDecoration(labelText: 'Nomor HP')),
+            const SizedBox(height: 12),
+            TextField(controller: addressController, decoration: const InputDecoration(labelText: 'Alamat')),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+        ElevatedButton(onPressed: () async {
+            final auth = Provider.of<AuthProvider>(context, listen: false);
+            final updatedUser = user.copyWith(
+              name: nameController.text,
+              phoneNumber: phoneController.text,
+              address: addressController.text,
+            );
+            await auth.updateUser(updatedUser);
+            Navigator.pop(ctx);
+        }, child: const Text('Simpan'))
+      ],
+    ));
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Matching HTML 6
-    final user = Provider.of<AuthProvider>(context).currentUser;
+    // Matching HTML 6 but removing Gold Member
+    final auth = Provider.of<AuthProvider>(context);
+    final user = auth.currentUser;
     final primary = Theme.of(context).primaryColor;
 
     return Scaffold(
@@ -18,7 +62,9 @@ class ProfileScreen extends StatelessWidget {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              if (user != null) _editProfile(user);
+            },
             icon: CircleAvatar(
               backgroundColor: Colors.white.withValues(alpha: 0.1),
               child: Icon(Icons.edit, color: primary),
@@ -64,25 +110,17 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(user?.name ?? 'Guest User', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: primary.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text('GOLD MEMBER', style: TextStyle(color: primary, fontSize: 10, fontWeight: FontWeight.bold)),
-            ),
+            // REMOVED GOLD MEMBER BADGE as requested
             const SizedBox(height: 4),
             Text(user?.email ?? '', style: const TextStyle(color: Colors.grey)),
 
             const SizedBox(height: 24),
-            // Stats
+            // Stats (Mock data for now, could be real if orders are fetched here)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
                 children: [
-                  _buildStatItem(context, '2', 'Pesanan Aktif'),
+                  _buildStatItem(context, '0', 'Pesanan Aktif'), // Placeholder
                   const SizedBox(width: 12),
                   _buildStatItem(context, '150', 'Poin'),
                   const SizedBox(width: 12),
@@ -103,9 +141,13 @@ class ProfileScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _buildMenuItem(context, Icons.receipt_long, 'Pesanan Saya', badge: '2 Baru'),
+                  _buildMenuItem(context, Icons.receipt_long, 'Pesanan Saya', onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const OrderHistoryScreen()));
+                  }),
                   const Divider(height: 1, color: Colors.white12),
-                  _buildMenuItem(context, Icons.history, 'Riwayat Belanja'),
+                  _buildMenuItem(context, Icons.history, 'Riwayat Belanja', onTap: () {
+                     Navigator.push(context, MaterialPageRoute(builder: (_) => const OrderHistoryScreen()));
+                  }),
                 ],
               ),
             ),
@@ -121,9 +163,11 @@ class ProfileScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _buildMenuItem(context, Icons.location_on, 'Alamat Pengiriman'),
+                  _buildMenuItem(context, Icons.location_on, 'Alamat Pengiriman', onTap: () {
+                     if (user != null) _editProfile(user); // Quick shortcut to edit address
+                  }),
                   const Divider(height: 1, color: Colors.white12),
-                  _buildMenuItem(context, Icons.credit_card, 'Metode Pembayaran'),
+                  _buildMenuItem(context, Icons.credit_card, 'Metode Pembayaran'), // Placeholder for future feature
                   const Divider(height: 1, color: Colors.white12),
                   _buildMenuItem(context, Icons.lock, 'Keamanan & Password'),
                 ],
@@ -209,10 +253,10 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(BuildContext context, IconData icon, String label, {String? badge, bool isToggle = false}) {
+  Widget _buildMenuItem(BuildContext context, IconData icon, String label, {String? badge, bool isToggle = false, VoidCallback? onTap}) {
      final primary = Theme.of(context).primaryColor;
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
