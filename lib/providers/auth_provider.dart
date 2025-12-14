@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user.dart';
 import '../models/order_model.dart';
 import '../services/database_service.dart';
@@ -8,9 +9,12 @@ import '../services/web_database_service.dart';
 class AuthProvider with ChangeNotifier {
   late DatabaseService _dbService;
   User? _currentUser;
+  bool _isRestoringAuth = true;
+  static const String _authKey = 'auth_user_id';
 
   User? get currentUser => _currentUser;
   bool get isAuthenticated => _currentUser != null;
+  bool get isRestoringAuth => _isRestoringAuth;
 
   AuthProvider() {
     if (kIsWeb) {
@@ -21,9 +25,39 @@ class AuthProvider with ChangeNotifier {
     _dbService.init();
   }
 
+  Future<bool> tryAutoLogin() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (!prefs.containsKey(_authKey)) {
+        _isRestoringAuth = false;
+        notifyListeners();
+        return false;
+      }
+
+      final userId = prefs.getString(_authKey);
+      if (userId == null) {
+        _isRestoringAuth = false;
+        notifyListeners();
+        return false;
+      }
+
+      _currentUser = await _dbService.getUserById(userId);
+    } catch (e) {
+      print("Auto login error: $e");
+    }
+
+    _isRestoringAuth = false;
+    notifyListeners();
+    return _currentUser != null;
+  }
+
   Future<bool> login(String email, String password) async {
     try {
       _currentUser = await _dbService.login(email, password);
+      if (_currentUser != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(_authKey, _currentUser!.id);
+      }
       notifyListeners();
       return _currentUser != null;
     } catch (e) {
@@ -38,6 +72,10 @@ class AuthProvider with ChangeNotifier {
       User newUser = User(id: id, email: email, name: name, password: password);
       await _dbService.register(newUser);
       _currentUser = newUser;
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_authKey, newUser.id);
+
       notifyListeners();
       return true;
     } catch (e) {
@@ -78,8 +116,10 @@ class AuthProvider with ChangeNotifier {
     return [];
   }
 
-  void logout() {
+  Future<void> logout() async {
     _currentUser = null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_authKey);
     notifyListeners();
   }
 }

@@ -47,6 +47,16 @@ class WebDatabaseService implements DatabaseService {
   }
 
   @override
+  Future<User?> getUserById(String id) async {
+    List<User> users = await _getUsers();
+    try {
+      return users.firstWhere((u) => u.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  @override
   Future<void> updateUser(User user) async {
     List<User> users = await _getUsers();
     int index = users.indexWhere((u) => u.id == user.id);

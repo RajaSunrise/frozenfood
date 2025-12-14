@@ -51,6 +51,20 @@ class MobileDatabaseService implements DatabaseService {
   }
 
   @override
+  Future<User?> getUserById(String id) async {
+    await init();
+    final List<Map<String, dynamic>> maps = await _database!.query(
+      'users',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    if (maps.isNotEmpty) {
+      return User.fromJson(maps.first);
+    }
+    return null;
+  }
+
+  @override
   Future<void> updateUser(User user) async {
     await init();
     await _database!.update(

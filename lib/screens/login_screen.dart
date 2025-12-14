@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import 'main_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -34,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _goToRegister() {
-    // Navigate to register screen (implementation below)
+    // Navigate to register screen
      Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => const RegisterScreen()),
       );
@@ -56,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
               width: 250,
               height: 250,
               decoration: BoxDecoration(
-                color: primary.withValues(alpha: 0.1),
+                color: primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: BackdropFilter(filter:  ui.ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0), child: Container()), // Blur simulation
@@ -69,7 +70,7 @@ class _LoginScreenState extends State<LoginScreen> {
               width: 200,
               height: 200,
               decoration: BoxDecoration(
-                color: primary.withValues(alpha: 0.05),
+                color: primary.withOpacity(0.05),
                 shape: BoxShape.circle,
               ),
             ),
@@ -86,9 +87,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       IconButton(
                         onPressed: () {},
                         icon: const Icon(Icons.arrow_back),
-                        style: IconButton.styleFrom(backgroundColor: Colors.white.withValues(alpha: 0.05)),
+                        style: IconButton.styleFrom(backgroundColor: Colors.white.withOpacity(0.05)),
                       ),
-                      Text('Bantuan', style: TextStyle(color: Colors.white.withValues(alpha: 0.5))),
+                      Text('Bantuan', style: TextStyle(color: Colors.white.withOpacity(0.5))),
                     ],
                   ),
                   const Spacer(flex: 1),
@@ -98,13 +99,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 80,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [primary.withValues(alpha: 0.2), primary.withValues(alpha: 0.05)],
+                        colors: [primary.withOpacity(0.2), primary.withOpacity(0.05)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: primary.withValues(alpha: 0.3)),
-                      boxShadow: [BoxShadow(color: primary.withValues(alpha: 0.15), blurRadius: 15)],
+                      border: Border.all(color: primary.withOpacity(0.3)),
+                      boxShadow: [BoxShadow(color: primary.withOpacity(0.15), blurRadius: 15)],
                     ),
                     child: Icon(Icons.ac_unit, color: primary, size: 40),
                   ),
@@ -162,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         foregroundColor: Colors.black,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         elevation: 4,
-                        shadowColor: primary.withValues(alpha: 0.3),
+                        shadowColor: primary.withOpacity(0.3),
                       ),
                       child: _isLoading
                           ? const CircularProgressIndicator()
@@ -173,12 +174,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   // Social Login Divider
                   Row(
                     children: [
-                      Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.1))),
+                      Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16),
                         child: Text('Atau masuk dengan', style: TextStyle(color: Colors.grey)),
                       ),
-                      Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.1))),
+                      Expanded(child: Divider(color: Colors.white.withOpacity(0.1))),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -190,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           icon: const Icon(Icons.g_mobiledata, size: 28), // Mock Google Icon
                           label: const Text('Google', style: TextStyle(color: Colors.white)),
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                            side: BorderSide(color: Colors.white.withOpacity(0.1)),
                             backgroundColor: const Color(0xFF162A2A),
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -204,7 +205,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           icon: const Icon(Icons.apple, size: 28),
                           label: const Text('Apple', style: TextStyle(color: Colors.white)),
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                            side: BorderSide(color: Colors.white.withOpacity(0.1)),
                             backgroundColor: const Color(0xFF162A2A),
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -235,61 +236,3 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
-  @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
-}
-
-class _RegisterScreenState extends State<RegisterScreen> {
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _isLoading = false;
-
-  void _register() async {
-    setState(() => _isLoading = true);
-    final success = await Provider.of<AuthProvider>(context, listen: false)
-        .register(_nameController.text, _emailController.text, _passwordController.text);
-    setState(() => _isLoading = false);
-
-    if (success) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const MainScreen()),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registrasi gagal. Coba email lain.')),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Minimal version reusing styles
-    return Scaffold(
-      appBar: AppBar(title: const Text('Daftar')),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            TextField(controller: _nameController, decoration: const InputDecoration(labelText: 'Nama Lengkap')),
-            const SizedBox(height: 16),
-            TextField(controller: _emailController, decoration: const InputDecoration(labelText: 'Email')),
-            const SizedBox(height: 16),
-            TextField(controller: _passwordController, decoration: const InputDecoration(labelText: 'Password'), obscureText: true),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _register,
-                child: const Text('Daftar'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
