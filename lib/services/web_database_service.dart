@@ -10,7 +10,6 @@ class WebDatabaseService implements DatabaseService {
 
   @override
   Future<void> init() async {
-    // Shared preferences init is synchronous in usage but we ensure instance is ready
   }
 
   Future<List<User>> _getUsers() async {
@@ -45,6 +44,16 @@ class WebDatabaseService implements DatabaseService {
     }
     users.add(user);
     await _saveUsers(users);
+  }
+
+  @override
+  Future<void> updateUser(User user) async {
+    List<User> users = await _getUsers();
+    int index = users.indexWhere((u) => u.id == user.id);
+    if (index != -1) {
+      users[index] = user;
+      await _saveUsers(users);
+    }
   }
 
   Future<List<OrderModel>> _getAllOrders() async {

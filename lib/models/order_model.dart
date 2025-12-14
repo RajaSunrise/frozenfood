@@ -3,13 +3,21 @@ class OrderModel {
   final String userId;
   final double totalAmount;
   final String date;
-  final List<dynamic> items; // Simplified items list (json)
+  final String status;
+  final String shippingMethod;
+  final String paymentMethod;
+  final String shippingAddress;
+  final List<dynamic> items;
 
   OrderModel({
     required this.id,
     required this.userId,
     required this.totalAmount,
     required this.date,
+    this.status = 'Pending',
+    required this.shippingMethod,
+    required this.paymentMethod,
+    required this.shippingAddress,
     required this.items,
   });
 
@@ -19,6 +27,10 @@ class OrderModel {
       'userId': userId,
       'totalAmount': totalAmount,
       'date': date,
+      'status': status,
+      'shippingMethod': shippingMethod,
+      'paymentMethod': paymentMethod,
+      'shippingAddress': shippingAddress,
       'items': items,
     };
   }
@@ -29,6 +41,10 @@ class OrderModel {
       userId: json['userId'],
       totalAmount: (json['totalAmount'] as num).toDouble(),
       date: json['date'],
+      status: json['status'] ?? 'Pending',
+      shippingMethod: json['shippingMethod'] ?? 'Instant',
+      paymentMethod: json['paymentMethod'] ?? 'Transfer',
+      shippingAddress: json['shippingAddress'] ?? '',
       items: json['items'] ?? [],
     );
   }

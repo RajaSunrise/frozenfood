@@ -2,9 +2,18 @@ class User {
   final String id;
   final String email;
   final String name;
-  final String password; // storing plain for simplicity/mock, usually hashed
+  final String password;
+  final String address;
+  final String phoneNumber;
 
-  User({required this.id, required this.email, required this.name, required this.password});
+  User({
+    required this.id,
+    required this.email,
+    required this.name,
+    required this.password,
+    this.address = '',
+    this.phoneNumber = '',
+  });
 
   Map<String, dynamic> toJson() {
     return {
@@ -12,6 +21,8 @@ class User {
       'email': email,
       'name': name,
       'password': password,
+      'address': address,
+      'phoneNumber': phoneNumber,
     };
   }
 
@@ -21,6 +32,25 @@ class User {
       email: json['email'],
       name: json['name'],
       password: json['password'],
+      address: json['address'] ?? '',
+      phoneNumber: json['phoneNumber'] ?? '',
+    );
+  }
+
+  User copyWith({
+    String? name,
+    String? email,
+    String? password,
+    String? address,
+    String? phoneNumber,
+  }) {
+    return User(
+      id: id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      password: password ?? this.password,
+      address: address ?? this.address,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
     );
   }
 }

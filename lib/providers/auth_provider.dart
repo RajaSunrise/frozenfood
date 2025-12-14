@@ -46,10 +46,29 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<bool> updateUser(User user) async {
+    try {
+      await _dbService.updateUser(user);
+      _currentUser = user;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
+  }
+
   Future<void> saveOrder(OrderModel order) async {
     if (_currentUser != null) {
       await _dbService.saveOrder(order);
     }
+  }
+
+  Future<List<OrderModel>> getOrders() async {
+    if (_currentUser != null) {
+      return await _dbService.getOrders(_currentUser!.id);
+    }
+    return [];
   }
 
   void logout() {

@@ -11,24 +11,19 @@ class MobileDatabaseService implements DatabaseService {
   @override
   Future<void> init() async {
     if (_database != null) return;
-    String path = join(await getDatabasesPath(), 'frozen_food.db');
+    String path = join(await getDatabasesPath(), 'frozen_food_v3.db'); // Bumped DB name/version for schema change
     _database = await openDatabase(
       path,
-      version: 2, // Incremented version
+      version: 1,
       onCreate: (db, version) {
         _createDb(db);
-      },
-      onUpgrade: (db, oldVersion, newVersion) {
-        if (oldVersion < 2) {
-          db.execute('CREATE TABLE IF NOT EXISTS orders(id TEXT PRIMARY KEY, userId TEXT, totalAmount REAL, date TEXT, items TEXT)');
-        }
       },
     );
   }
 
   void _createDb(Database db) {
-    db.execute('CREATE TABLE users(id TEXT PRIMARY KEY, email TEXT, name TEXT, password TEXT)');
-    db.execute('CREATE TABLE orders(id TEXT PRIMARY KEY, userId TEXT, totalAmount REAL, date TEXT, items TEXT)');
+    db.execute('CREATE TABLE users(id TEXT PRIMARY KEY, email TEXT, name TEXT, password TEXT, address TEXT, phoneNumber TEXT)');
+    db.execute('CREATE TABLE orders(id TEXT PRIMARY KEY, userId TEXT, totalAmount REAL, date TEXT, status TEXT, shippingMethod TEXT, paymentMethod TEXT, shippingAddress TEXT, items TEXT)');
   }
 
   @override
@@ -56,10 +51,21 @@ class MobileDatabaseService implements DatabaseService {
   }
 
   @override
+  Future<void> updateUser(User user) async {
+    await init();
+    await _database!.update(
+      'users',
+      user.toJson(),
+      where: 'id = ?',
+      whereArgs: [user.id],
+    );
+  }
+
+  @override
   Future<void> saveOrder(OrderModel order) async {
     await init();
     Map<String, dynamic> data = order.toJson();
-    data['items'] = jsonEncode(data['items']); // Store items as JSON string
+    data['items'] = jsonEncode(data['items']);
     await _database!.insert(
       'orders',
       data,

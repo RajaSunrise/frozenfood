@@ -3,18 +3,78 @@ import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import '../providers/auth_provider.dart';
 import '../models/order_model.dart';
+import '../models/user.dart';
 import 'main_screen.dart';
 
-class CheckoutScreen extends StatelessWidget {
+class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
+
+  @override
+  State<CheckoutScreen> createState() => _CheckoutScreenState();
+}
+
+class _CheckoutScreenState extends State<CheckoutScreen> {
+  String _selectedShipping = 'Instant';
+  String _selectedPayment = 'Transfer Virtual Account';
+  final TextEditingController _addressController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final user = Provider.of<AuthProvider>(context, listen: false).currentUser;
+    _addressController.text = user?.address ?? '';
+  }
+
+  @override
+  void dispose() {
+    _addressController.dispose();
+    super.dispose();
+  }
+
+  void _changeAddress() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Ubah Alamat'),
+        content: TextField(
+          controller: _addressController,
+          decoration: const InputDecoration(labelText: 'Alamat Lengkap'),
+          maxLines: 3,
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+          TextButton(
+            onPressed: () async {
+              final auth = Provider.of<AuthProvider>(context, listen: false);
+              if (auth.isAuthenticated) {
+                User updatedUser = auth.currentUser!.copyWith(address: _addressController.text);
+                await auth.updateUser(updatedUser);
+                setState(() {}); // refresh UI
+              }
+              Navigator.pop(ctx);
+            },
+            child: const Text('Simpan'),
+          ),
+        ],
+      )
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     // Matching HTML 5
     final cart = Provider.of<CartProvider>(context);
-    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final auth = Provider.of<AuthProvider>(context); // Listen to auth for user updates
+    final user = auth.currentUser;
     final primary = Theme.of(context).primaryColor;
-    final total = cart.totalAmount * 1.1 + 20000 + 5000 + 1000; // Mock calculation matching design
+
+    // Shipping Costs Mock
+    double shippingCost = 0;
+    if (_selectedShipping == 'Instant') shippingCost = 20000;
+    if (_selectedShipping == 'Same Day') shippingCost = 15000;
+    if (_selectedShipping == 'Reguler') shippingCost = 10000;
+
+    final total = cart.totalAmount * 1.1 + shippingCost + 5000 + 1000; // Mock calculation
 
     void placeOrder() async {
       if (!auth.isAuthenticated) {
@@ -27,6 +87,9 @@ class CheckoutScreen extends StatelessWidget {
         userId: auth.currentUser!.id,
         totalAmount: total,
         date: DateTime.now().toIso8601String(),
+        shippingMethod: _selectedShipping,
+        paymentMethod: _selectedPayment,
+        shippingAddress: user?.address ?? _addressController.text,
         items: cart.items.values.map((e) => e.toJson()).toList(),
       );
 
@@ -35,10 +98,8 @@ class CheckoutScreen extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Pesanan Dibuat!')));
       cart.clear();
       Navigator.popUntil(context, (route) => route.isFirst);
-       // Navigate to MainScreen if popped too far or just pop until home
-       // Using pushReplacement to MainScreen to ensure we land on home
+       // Navigate to MainScreen
        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => const MainScreen()));
-
     }
 
     return Scaffold(
@@ -107,12 +168,12 @@ class CheckoutScreen extends StatelessWidget {
                                   ],
                                 ),
                                 const SizedBox(height: 4),
-                                const Text(
-                                  'Jl. Melati No. 12, RT.05/RW.02, Cilandak, Jakarta Selatan, 12430',
-                                  style: TextStyle(color: Colors.grey, fontSize: 13),
+                                Text(
+                                  (user?.address != null && user!.address.isNotEmpty) ? user.address : 'Belum ada alamat',
+                                  style: const TextStyle(color: Colors.grey, fontSize: 13),
                                 ),
                                 const SizedBox(height: 8),
-                                const Text('Budi Santoso (+62 812-3456-7890)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                Text('${user?.name} (${user?.phoneNumber.isNotEmpty == true ? user!.phoneNumber : "-"})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                               ],
                             ),
                           )
@@ -122,7 +183,7 @@ class CheckoutScreen extends StatelessWidget {
                       const Divider(color: Colors.white12),
                       Align(
                         alignment: Alignment.centerRight,
-                        child: TextButton(onPressed: () {}, child: Text('Ubah Alamat', style: TextStyle(color: primary))),
+                        child: TextButton(onPressed: _changeAddress, child: Text('Ubah Alamat', style: TextStyle(color: primary))),
                       )
                     ],
                   ),
@@ -137,11 +198,11 @@ class CheckoutScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     children: [
-                      _buildDeliveryOption(context, 'Instant', '1-3 Jam', 'Rp 20.000', Icons.rocket_launch, isSelected: true),
+                      _buildDeliveryOption(context, 'Instant', '1-3 Jam', 'Rp 20.000', Icons.rocket_launch, isSelected: _selectedShipping == 'Instant'),
                       const SizedBox(width: 12),
-                      _buildDeliveryOption(context, 'Same Day', '6-8 Jam', 'Rp 15.000', Icons.local_shipping),
+                      _buildDeliveryOption(context, 'Same Day', '6-8 Jam', 'Rp 15.000', Icons.local_shipping, isSelected: _selectedShipping == 'Same Day'),
                       const SizedBox(width: 12),
-                      _buildDeliveryOption(context, 'Reguler', '1-2 Hari', 'Rp 10.000', Icons.inventory_2),
+                      _buildDeliveryOption(context, 'Reguler', '1-2 Hari', 'Rp 10.000', Icons.inventory_2, isSelected: _selectedShipping == 'Reguler'),
                     ],
                   ),
                 ),
@@ -154,11 +215,11 @@ class CheckoutScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
                     children: [
-                      _buildPaymentOption(context, 'Transfer Virtual Account', 'Cek otomatis', isSelected: true),
+                      _buildPaymentOption(context, 'Transfer Virtual Account', 'Cek otomatis', isSelected: _selectedPayment == 'Transfer Virtual Account'),
                       const SizedBox(height: 12),
-                      _buildPaymentOption(context, 'GoPay', 'Hubungkan akun'),
+                      _buildPaymentOption(context, 'GoPay', 'Hubungkan akun', isSelected: _selectedPayment == 'GoPay'),
                       const SizedBox(height: 12),
-                      _buildPaymentOption(context, 'COD (Bayar di Tempat)', 'Tunai saat barang sampai'),
+                      _buildPaymentOption(context, 'COD (Bayar di Tempat)', 'Tunai saat barang sampai', isSelected: _selectedPayment == 'COD (Bayar di Tempat)'),
                     ],
                   ),
                 ),
@@ -173,7 +234,7 @@ class CheckoutScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: const Color(0xFF162A2A).withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white12, style: BorderStyle.solid), // Dashed border simulation difficult without package
+                    border: Border.all(color: Colors.white12, style: BorderStyle.solid),
                   ),
                   child: Column(
                     children: [
@@ -196,11 +257,11 @@ class CheckoutScreen extends StatelessWidget {
                             Text('Rp ${(item.price * item.quantity).toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold)),
                           ],
                         ),
-                      )).toList(),
+                      )),
                       const Divider(color: Colors.white12),
                       const SizedBox(height: 8),
                       _buildCostRow('Subtotal Produk', 'Rp ${cart.totalAmount.toStringAsFixed(0)}'),
-                      _buildCostRow('Biaya Pengiriman', 'Rp 20.000'),
+                      _buildCostRow('Biaya Pengiriman', 'Rp ${shippingCost.toStringAsFixed(0)}'),
                       _buildCostRow('Biaya Kemasan & Ice Gel', 'Rp 5.000'),
                       _buildCostRow('Biaya Layanan', 'Rp 1.000'),
                     ],
@@ -273,88 +334,95 @@ class CheckoutScreen extends StatelessWidget {
 
   Widget _buildDeliveryOption(BuildContext context, String title, String subtitle, String price, IconData icon, {bool isSelected = false}) {
     final primary = Theme.of(context).primaryColor;
-    return Container(
-      width: 160,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: isSelected ? primary.withValues(alpha: 0.05) : const Color(0xFF162A2A),
-        border: Border.all(color: isSelected ? primary : Colors.transparent, width: 2),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(icon, color: isSelected ? primary : Colors.grey),
-              if (isSelected)
-                Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(color: primary, shape: BoxShape.circle),
-                  child: const Icon(Icons.check, size: 12, color: Colors.black),
-                )
-              else
-                Container(
-                  width: 16, height: 16,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.grey),
-                  ),
-                )
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-          Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-          const SizedBox(height: 8),
-          Text(price, style: TextStyle(fontWeight: FontWeight.bold, color: isSelected ? primary : Colors.white)),
-        ],
+    return GestureDetector(
+      onTap: () => setState(() => _selectedShipping = title),
+      child: Container(
+        width: 160,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected ? primary.withValues(alpha: 0.05) : const Color(0xFF162A2A),
+          border: Border.all(color: isSelected ? primary : Colors.transparent, width: 2),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(icon, color: isSelected ? primary : Colors.grey),
+                if (isSelected)
+                  Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(color: primary, shape: BoxShape.circle),
+                    child: const Icon(Icons.check, size: 12, color: Colors.black),
+                  )
+                else
+                  Container(
+                    width: 16, height: 16,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.grey),
+                    ),
+                  )
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+            const SizedBox(height: 8),
+            Text(price, style: TextStyle(fontWeight: FontWeight.bold, color: isSelected ? primary : Colors.white)),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildPaymentOption(BuildContext context, String title, String subtitle, {bool isSelected = false}) {
      final primary = Theme.of(context).primaryColor;
-    return Container(
-      padding: const EdgeInsets.all(16),
-       decoration: BoxDecoration(
-        color: isSelected ? primary.withValues(alpha: 0.05) : const Color(0xFF162A2A),
-        border: Border.all(color: isSelected ? primary : Colors.transparent),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 50, height: 36,
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4)),
-            // Logo placeholder
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-              ],
+    return GestureDetector(
+      onTap: () => setState(() => _selectedPayment = title),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+         decoration: BoxDecoration(
+          color: isSelected ? primary.withValues(alpha: 0.05) : const Color(0xFF162A2A),
+          border: Border.all(color: isSelected ? primary : Colors.transparent),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 50, height: 36,
+              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4)),
+              // Logo placeholder
+              child: const Icon(Icons.payments, color: Colors.black, size: 20),
             ),
-          ),
-           if (isSelected)
-                Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(color: primary, shape: BoxShape.circle),
-                  child: const Icon(Icons.check, size: 12, color: Colors.black),
-                )
-              else
-                Container(
-                  width: 16, height: 16,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.grey),
-                  ),
-                )
-        ],
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  Text(subtitle, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                ],
+              ),
+            ),
+             if (isSelected)
+                  Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(color: primary, shape: BoxShape.circle),
+                    child: const Icon(Icons.check, size: 12, color: Colors.black),
+                  )
+                else
+                  Container(
+                    width: 16, height: 16,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.grey),
+                    ),
+                  )
+          ],
+        ),
       ),
     );
   }
